@@ -1,0 +1,7 @@
+shcluster_bundle_target: https://splunk-qa-search01.example.com:8089
+deployment_server: splunk-qa-util.example.com:8089
+splunk_environment: qa
+SPLUNK_ENVIRONMENT_NAME: splunk-qa
+splunk_environment_name: splunk-qa
+index_master: https://splunk-qa-util.example.com:8089
+license_master: https://splunk-qa-license.example.com:8089

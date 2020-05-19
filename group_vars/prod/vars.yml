@@ -1,0 +1,8 @@
+shcluster_bundle_target: https://splunk-search01.example.com:8089
+deployment_server: splunk-util.example.com:8089
+splunk_environment: prod
+splunk_environment_name: splunk
+SPLUNK_ENVIRONMENT_NAME: splunk
+
+index_master: https://splunk-index-master.example.com:8089
+license_master: https://splunk-license.example.com:8089

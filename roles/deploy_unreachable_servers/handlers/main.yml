@@ -1,0 +1,15 @@
+---
+
+- name: "[windows] update unreachable/manual forwarders"
+  win_service:
+    name: splunkforwarder
+    state: restarted
+  when: ansible_distribution == 'Windows'
+  listen: "apply new splunk config to unreachable forwarders"
+
+- name: "[*nix] update unreachable/manual forwarders"
+  service:
+    name: splunkd
+    state: restarted
+  when: ansible_distribution != 'Windows'
+  listen: "apply new splunk config to unreachable forwarders"

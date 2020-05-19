@@ -1,0 +1,14 @@
+[qa]
+[qa:children]
+shcluster
+indexer
+forwarder
+
+[shcluster]
+qa-shclusterdeployer.example.com
+
+[indexer]
+qa-index-master.example.com
+
+[forwarder]
+qa-forwarderdeployer.example.com

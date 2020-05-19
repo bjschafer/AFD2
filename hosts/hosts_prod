@@ -1,0 +1,14 @@
+[prod]
+[prod:children]
+shcluster
+indexer
+forwarder
+
+[shcluster]
+shclusterdeployer.example.com
+
+[indexer]
+index-master.example.com
+
+[forwarder]
+forwarderdeployer.example.com

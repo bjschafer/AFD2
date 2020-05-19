@@ -1,0 +1,36 @@
+---
+
+- name: push out forwarder config
+  #debug:
+  #  msg: "Would run /opt/splunk/bin/splunk reload deploy-server"
+  command: /opt/splunk/bin/splunk reload deploy-server -auth {{ splunk_user|quote }}:{{ splunk_pass|quote }}
+  listen: "apply new splunk config"
+  when: "'forwarder' in group_names"
+
+- name: push out indexer bundle
+  #debug:
+  #  msg: "would run /opt/splunk/bin/splunk apply cluster-bundle --answer-yes -auth {{ splunk_user|quote }}:{{ splunk_pass|quote }}"
+  command: /opt/splunk/bin/splunk apply cluster-bundle --answer-yes -auth {{ splunk_user|quote }}:{{ splunk_pass|quote }}
+  listen: "apply new splunk config"
+  register: apply_indexer_bundle
+  failed_when: "'Created new bundle with checksum' not in apply_indexer_bundle['stdout'] and 'The master and peers already have this bundle' not in apply_indexer_bundle['stderr'] and 'The Bundle is already marked invalid' not in apply_indexer_bundle['stderr']"
+  when: "'indexer' in group_names"
+
+- name: update dblookups before pushing shcluster
+  command: /opt/splunk/bin/dblookup-deploy.sh /opt/splunk/etc/deploy_credentials --no-deploy
+  listen: "apply new splunk config"
+  when: "'shcluster' in group_names"
+
+- name: push out shcluster bundle
+  #debug:
+  #  msg: "Would run /opt/splunk/bin/splunk apply shcluster-bundle -target {{ shcluster_bundle_target|quote }} --answer-yes -auth {{ splunk_user|quote }}:{{ splunk_pass|quote }}"
+  command: /opt/splunk/bin/splunk apply shcluster-bundle -target {{ shcluster_bundle_target|quote }} --answer-yes -auth {{ splunk_user|quote }}:{{ splunk_pass|quote }}
+  listen: "apply new splunk config"
+  register: apply_shcluster_bundle
+  failed_when: "'Bundle has been pushed successfully' not in apply_shcluster_bundle['stdout']"
+  when: "'shcluster' in group_names"
+
+- name: restart standalone splunk
+  listen: "apply new splunk config"
+  command: /opt/splunk/bin/splunk restart
+  when: "'standalone' in group_names"

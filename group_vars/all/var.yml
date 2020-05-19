@@ -1,0 +1,16 @@
+user_group: wheel
+deploy_dir_base: /opt/splunk/etc
+splunk_user: splunk-deploy
+ansible_user: splunk
+git_secrets_path: /opt/splunk/.git-secrets
+git_repo_dir: /tmp/afd2/
+git_repo_uri_base: ssh://git@gitlab.example.com/splunk/apps
+deploy_key_path: /opt/splunk/.git-secrets/deploy_key.rsa
+indexes_paths: 
+  - shconfig/local/indexes.conf
+  - indexer_cluster/local/indexes.conf
+  - indexes-config/local/indexes.conf
+deploy_dirs:
+  shcluster: "{{ deploy_dir_base }}/shcluster/apps"
+  indexer: "{{ deploy_dir_base }}/master-apps/"
+  forwarder: "{{ deploy_dir_base }}/deployment-apps"
