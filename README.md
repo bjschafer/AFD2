@@ -1,3 +1,5 @@
+[![Documentation Status](https://readthedocs.org/projects/afd2/badge/?version=latest)](https://afd2.readthedocs.io/en/latest/?badge=latest)
+
 # AFD2
 
 ## How to use
