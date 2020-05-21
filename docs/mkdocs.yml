@@ -1,7 +1,6 @@
 site_name: AFD2
 theme:
     name: material
-    custom_dir: theme
 plugins:
     - search
     - git-revision-date
