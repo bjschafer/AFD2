@@ -1,0 +1,94 @@
+---
+
+- name: include apps variables
+  include_vars:
+    dir: ../../../../apps
+    name: apps
+    ignore_unknown_extensions: yes
+
+- name: include indexes variables
+  include_vars:
+    dir: ../../../../indexes
+    name: indexes
+    ignore_unknown_extensions: yes
+
+- name: include secrets variables
+  include_vars:
+    file: "../../../../secrets/{{ splunk_environment }}.vault.yaml"
+
+# after this step, all git repos in apps will be cloned/pulled into {{ git_repo_dir }}
+- name: clone git repos locally
+  git:
+      repo: "{{ git_repo_uri_base }}//{{ item['key'] }}.git"
+      dest: "{{ git_repo_dir }}/{{ item['key'] }}"
+      accept_hostkey: yes
+      clone: yes
+      depth: 1 # only gets the latest commit. faster and smaller.
+      force: yes # discards modified files
+      update: yes
+      version: "{{ item['value']['branches'][splunk_environment] }}"
+      key_file: "{{ deploy_key_path }}"
+  run_once: True
+  loop: "{{ apps | dict2items }}"
+  # item['key'] is the app name
+  # item['value'] is the definition so we can do item[0]['value']['path'] or w/e
+  when: "item['value']['branches'][splunk_environment] is defined"
+  notify: apply new splunk config
+  delegate_to: localhost
+
+- name: find template files
+  find:
+      paths: "{{ git_repo_dir }}"
+      file_type: file
+      patterns: '*.j2'
+      recurse: yes
+  register: template_files
+  delegate_to: localhost
+
+  # this will process all .j2 template files in all cloned repos, setting vars that ansible knows
+  # about.
+- name: template out files
+  template:
+      src: "{{ item['path'] }}"
+      dest: "{{ item['path'] | regex_replace('\\.j2$') }}" # chop off .j2 extension
+  loop: "{{ template_files.files }}"
+  delegate_to: localhost
+
+- name: rsync apps to splunk servers
+  synchronize:
+      src: "{{ git_repo_dir }}/{{ item[0]['key'] }}"
+      dest: "{{ deploy_dirs[item[1]] }}"
+      recursive: true
+      # by default, deletes untracked files in the destination, unless
+      # delete_untracked: no is in the app definition
+      delete: "{{ item[0]['value']['delete_untracked'] | default('yes') | bool }}"
+      rsync_opts: # these are passed directly to invocation of rsync
+          - "--exclude=.git"
+          - "--exclude=*.j2" # ansible template files
+  when: "'standalone' not in group_names and item[1] in group_names and item[0]['value']['branches'][splunk_environment] is defined"
+  notify: apply new splunk config
+  # item[0]['key'] is the app name
+  # item[0]['value'] is the definition so we can do item[0]['value']['path'] or w/e
+  # item[1] is the deployto unrolled loop e.g. shcluster, indexer, etc.
+  loop: "{{ apps | dict2items | subelements('value.deployto') }}"
+
+# this assumes you already have a server class by this name.
+- name: update serverclass
+  uri:
+    url: https://{{ deployment_server }}/services/deployment/server/applications/{{ item[0]['key'] }}
+    method: POST
+    validate_certs: no # this should not be here but i don't have a good way to make it accept self-signed certs without running as root.
+    user: "{{ splunk_user }}"
+    password: "{{ splunk_pass }}"
+    body_format: form-urlencoded
+    body:
+      serverclass: "{{ item[0]['value']['serverclass'] }}"
+      restartSplunkd: True
+      stateOnClient: "enabled"
+  loop: "{{ apps | dict2items | subelements('value.deployto') }}"
+  # item[0]['key'] is the app name
+  # item[0]['value'] is the definition so we can do item[0]['value']['path'] or w/e
+  # item[1] is the deployto unrolled loop e.g. shcluster, indexer, etc.
+  when: item[0]['value']['serverclass'] is defined
+  ignore_errors: yes # sometimes people have inconsistencies in prod vs qa here. they can fix them manually and that's okay.
+  failed_when: no
