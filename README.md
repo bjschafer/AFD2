@@ -21,7 +21,7 @@ You need an ssh key in place. It must be added to the `.ssh/authorized_keys` fil
 
 ### Adding apps to deploy
 
-Ind your apps folder, create one `.yaml` file per app you'd like to deploy. It should contain something like this:
+In your apps folder, create one `.yaml` file per app you'd like to deploy. It should contain something like this:
 
 ```yaml
 app-name:
