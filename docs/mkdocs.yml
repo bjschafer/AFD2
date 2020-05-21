@@ -1,1 +1,17 @@
 site_name: AFD2
+theme:
+    name: material
+    custom_dir: theme
+plugins:
+    - search
+    - git-revision-date
+markdown_extensions:
+    - codehilite
+    - admonition
+    - pymdownx.inlinehilite
+    - pymdownx.magiclink
+    - pymdownx.superfences
+    - pymdownx.details
+repo_url: https://github.com/bjschafer/AFD2
+repo_name: GitHub
+edit_uri: 'edit/master/docs/'
