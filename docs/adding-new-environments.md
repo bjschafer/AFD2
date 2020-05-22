@@ -4,18 +4,19 @@ Clone the AFD2 repository -- not the Splunk repo. Open hosts/hosts in your favor
 
 You'll need to add a new environment below `qa`. 
 
-example hosts file with a new environment
-```toml
-[prod]
-splunk-util.example.com
-splunk-index-master.example.com
-
-[qa]
-splunk-qa-util.example.com
-
-[staging]
-splunk-stage.example.com
-```
+!!! example
+    hosts file with a new environment
+    ```toml
+    [prod]
+    splunk-util.example.com
+    splunk-index-master.example.com
+    
+    [qa]
+    splunk-qa-util.example.com
+    
+    [staging]
+    splunk-stage.example.com
+    ```
 
 Next, create a file in the `group_vars` folder named as your environment. Its contents should look like this:
 
