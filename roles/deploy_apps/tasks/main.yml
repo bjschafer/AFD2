@@ -35,6 +35,7 @@
   when: "item['value']['branches'][splunk_environment] is defined"
   notify: apply new splunk config
   delegate_to: localhost
+  check_mode: no # later steps depend on these existing on the machine running ansible-playbook, so we force this to actually do stuff even in check mode.
 
 - name: find template files
   find:
