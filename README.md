@@ -2,6 +2,8 @@
 
 [![Documentation Status](https://readthedocs.org/projects/afd2/badge/?version=latest)](https://afd2.readthedocs.io/en/latest/?badge=latest)
 
+See a sample control repo at [bjschafer/AFD2-sample](https://github.com/bjschafer/AFD2-sample)!
+
 ## How to use
 
  `ansible-playbook main.yml -vv --force-handlers -i hosts/hosts_qa`
