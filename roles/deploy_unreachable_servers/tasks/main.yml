@@ -1,13 +1,13 @@
 ---
 
-- name: "[*nix] deploy apps to unreachable servers" # dmz & extranet
+- name: "[*nix] deploy apps to unreachable servers"  # things not reachable from CI runner
   git:
     repo: "{{ git_repo_uri_base }}/{{ item['name'] }}"
     dest: "{{ deploy_dir }}/{{ item['name'] }}"
     accept_hostkey: yes
     clone: yes
-    depth: 1 # only gets the latest commit. faster and smaller.
-    force: yes # discards modified files
+    depth: 1  # only gets the latest commit. faster and smaller.
+    force: yes  # discards modified files
     update: yes
     version: "{{ item['branches'][splunk_environment] }}"
     key_file: "{{ deploy_key_path }}"
@@ -28,12 +28,12 @@
     dest: "/tmp/afd2/{{ item['name'] }}"
     accept_hostkey: yes
     clone: yes
-    depth: 1 # only gets the latest commit. faster and smaller.
-    force: yes # discards modified files
+    depth: 1  # only gets the latest commit. faster and smaller.
+    force: yes  # discards modified files
     update: yes
     version: "{{ item['branches'][splunk_environment] }}"
     key_file: "{{ deploy_key_path }}"
-    separate_git_dir: "{{ git_repo_dir_base }}\{{ item[0]['key'] }}"
+    separate_git_dir: "{{ git_repo_dir_base }}\\{{ item[0]['key'] }}"
   with_items: "{{ apps }}"
 
 - name: "[Windows] deploy apps to unreachable servers from local machine"

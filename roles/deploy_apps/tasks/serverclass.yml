@@ -1,0 +1,22 @@
+---
+
+- name: include serverclass variables
+  include_vars:
+    dir: ../../../../serverclasses
+    name: serverclasses
+    ignore_unknown_extensions: yes
+  tags:
+    - serverclass
+
+- name: debug serverclass
+  debug:
+      msg: "{{ serverclasses }}"
+  tags:
+    - serverclass
+
+- name: update serverclass
+  template:
+      src: templates/serverclass.conf.j2
+      dest: "{{ deploy_dir_base }}/system/local/serverclass.conf"
+  tags:
+    - serverclass

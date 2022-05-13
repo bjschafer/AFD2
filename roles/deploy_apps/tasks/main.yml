@@ -5,6 +5,8 @@
     dir: ../../../../apps
     name: apps
     ignore_unknown_extensions: yes
+  tags:
+    - serverclass
 
 - name: include indexes variables
   include_vars:
@@ -73,23 +75,7 @@
   # item[1] is the deployto unrolled loop e.g. shcluster, indexer, etc.
   loop: "{{ apps | dict2items | subelements('value.deployto') }}"
 
-# this assumes you already have a server class by this name.
-- name: update serverclass
-  uri:
-    url: https://{{ deployment_server }}/services/deployment/server/applications/{{ item[0]['key'] }}
-    method: POST
-    validate_certs: no # this should not be here but i don't have a good way to make it accept self-signed certs without running as root.
-    user: "{{ splunk_user }}"
-    password: "{{ splunk_pass }}"
-    body_format: form-urlencoded
-    body:
-      serverclass: "{{ item[0]['value']['serverclass'] }}"
-      restartSplunkd: True
-      stateOnClient: "enabled"
-  loop: "{{ apps | dict2items | subelements('value.deployto') }}"
-  # item[0]['key'] is the app name
-  # item[0]['value'] is the definition so we can do item[0]['value']['path'] or w/e
-  # item[1] is the deployto unrolled loop e.g. shcluster, indexer, etc.
-  when: item[0]['value']['serverclass'] is defined
-  ignore_errors: yes # sometimes people have inconsistencies in prod vs qa here. they can fix them manually and that's okay.
-  failed_when: no
+- name: "[serverclass] import serverclass tasks"
+  import_tasks: serverclass.yml
+  tags:
+    - serverclass

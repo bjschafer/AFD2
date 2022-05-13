@@ -5,10 +5,10 @@ indexer
 forwarder
 
 [shcluster]
-qa-shclusterdeployer.example.com
+shcaptain.fq.dn
 
 [indexer]
-qa-index-master.example.com
+idxcaptain.fq.dn
 
 [forwarder]
-qa-forwarderdeployer.example.com
+hwf.fq.dn

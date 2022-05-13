@@ -1,0 +1,35 @@
+[global]
+crossServerChecksum = true
+
+{% for serverclass in serverclasses | dict2items %}
+[serverClass:{{ serverclass['key'] }}]
+{% if serverclass['value'].allowlist is defined %}
+{% for allowlist in serverclass['value'].allowlist %}
+{# loop.index0 is a magic variable in jinja
+it's the zero-based index counter similar to enumerate() in python #}
+whitelist.{{ loop.index0 }} = {{ allowlist }}
+{% endfor %}
+{% endif %}
+{% if serverclass['value'].blocklist is defined %}
+{% for blocklist in serverclass['value'].blocklist %}
+blacklist.{{ loop.index0 }} = {{ blocklist }}
+{% endfor %}
+{% endif %}
+{% if serverclass['value'].machineTypesFilter is defined %}
+machineTypesFilter = {{ serverclass['value'].machineTypesFilter }}
+{% endif %}
+
+{% endfor %}
+
+{# now, the app mappings #}
+{%- for item in apps | dict2items | subelements('value.deployto') %}
+{%- if item[0]['value']['serverclass'] is defined %}
+{%- for serverclass in item[0].value.serverclass %}
+[serverClass:{{ serverclass }}:app:{{ item[0].key }}]
+restartSplunkWeb = {{ item[0].value.restartSplunkWeb | default("false") }}
+restartSplunkd = {{ item[0].value.restartSplunkd | default("true") }}
+stateOnClient = {{ item[0].value.stateOnClient | default("enabled") }}
+{% endfor %}
+
+{% endif %}
+{% endfor %}
